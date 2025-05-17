@@ -1,5 +1,6 @@
 package proyect_u_inventory.transformation.company.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -13,5 +14,6 @@ public class EmpleadoRequest {
     private String address;
     private String phone;
     private String email;
+    @JsonProperty("active")
     private boolean isActive;
 }

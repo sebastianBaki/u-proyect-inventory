@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Builder
 public class EmpleadoResponse {
     private Long id;
+    private String identificationNumber;
     private String name;
     private String address;
     private String phone;
