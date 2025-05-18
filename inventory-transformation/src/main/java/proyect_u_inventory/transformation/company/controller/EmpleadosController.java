@@ -1,16 +1,16 @@
 package proyect_u_inventory.transformation.company.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import proyect_u_inventory.transformation.company.dto.request.EmpleadoRequest;
 import proyect_u_inventory.transformation.company.dto.response.EmpleadoResponse;
+import proyect_u_inventory.transformation.company.exception.BussinesException;
 import proyect_u_inventory.transformation.company.service.EmpleadoService;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * controller de empleados
@@ -22,19 +22,24 @@ public class EmpleadosController {
     private EmpleadoService service;
 
     @GetMapping("/{id}")
-    public ResponseEntity<EmpleadoResponse> searchEmpleadoById(@PathVariable Long id) {
-        EmpleadoResponse response = service.getById(id);
-        if(response == null ) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> searchEmpleadoById(@PathVariable Long id) {
+        try {
+            EmpleadoResponse response = service.getById(id);
+            return ResponseEntity.ok(response);
+        } catch (BussinesException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<EmpleadoResponse>> searchAllEmpleados() {
-        List<EmpleadoResponse> responses = service.getAllEmpleados();
+    public ResponseEntity<?> searchAllEmpleados() {
+        try {
+            List<EmpleadoResponse> responses = service.getAllEmpleados();
             responses.sort(Comparator.comparing(EmpleadoResponse::getId));
-        return ResponseEntity.ok(responses);
+            return ResponseEntity.ok(responses);
+        } catch (BussinesException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PostMapping
@@ -44,13 +49,21 @@ public class EmpleadosController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEmpleadoById(@PathVariable Long id) {
-        service.deleteById(id);
-        return ResponseEntity.noContent().build();
+        try {
+            service.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (BussinesException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmpleadoResponse> updateEmpleadoById(@RequestBody EmpleadoRequest request, @PathVariable Long id) {
-        return ResponseEntity.ok(service.updateEmpleadoById(request, id));
+    public ResponseEntity<?> updateEmpleadoById(@RequestBody EmpleadoRequest request, @PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(service.updateEmpleadoById(request, id));
+        } catch (BussinesException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
 

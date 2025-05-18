@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import proyect_u_inventory.transformation.company.constants.ErrorMessages;
 import proyect_u_inventory.transformation.company.dto.request.EmpleadoRequest;
 import proyect_u_inventory.transformation.company.dto.response.EmpleadoResponse;
+import proyect_u_inventory.transformation.company.exception.BussinesException;
 import proyect_u_inventory.transformation.company.model.entity.Empleados;
 import proyect_u_inventory.transformation.company.repository.EmpleadosRepository;
 
@@ -28,28 +30,33 @@ public class EmpleadoServiceImpl implements EmpleadoService  {
     @Transactional
     public EmpleadoResponse createEmpleado(EmpleadoRequest empleadoRequest) {
         log.info("creando empleado : {} ", empleadoRequest.getIdenficationNumber());
-        Empleados empleados = buildEmpleadosForSave(empleadoRequest);
-        repository.save(empleados);
-        return createEmpleadoResponse(empleados);
+        try {
+            Empleados empleados = buildEmpleadosForSave(empleadoRequest);
+            repository.save(empleados);
+            return createEmpleadoResponse(empleados);
+        } catch (BussinesException e) {
+            throw new BussinesException(ErrorMessages.EMPLOYEE_CREATE, empleadoRequest.getIdenficationNumber());
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<EmpleadoResponse> getAllEmpleados() {
         log.info("buscando todos los empleados");
-        List<Empleados> empleadosDb = (List<Empleados>) repository.findAll();
-        List<EmpleadoResponse> response = buildEmpleadosAll(empleadosDb);
-        return response;
+            List<Empleados> empleadosDb = (List<Empleados>) repository.findAll();
+            return buildEmpleadosAll(empleadosDb);
     }
 
     @Override
     @Transactional(readOnly = true)
     public EmpleadoResponse getById(Long id) {
+        log.info("buscando empleado con id : {}", id);
         Optional<Empleados> empleados = repository.findById(id);
-        if (empleados.isPresent()) {
-            return createEmpleadoResponse(empleados.get());
+        if (!empleados.isPresent()) {
+            String identificator = String.valueOf(id);
+            throw new BussinesException(ErrorMessages.EMPLOYEE_GET, identificator);
         }
-        return null;
+        return createEmpleadoResponse(empleados.get());
     }
 
     @Override
@@ -57,9 +64,10 @@ public class EmpleadoServiceImpl implements EmpleadoService  {
     public void deleteById(Long id) {
         log.info("Eliminado empleado con ID: {}", id);
         Optional<Empleados> empleados = repository.findById(id);
-        if (empleados.isPresent()) {
-            repository.deleteById(id);
+        if (!empleados.isPresent()) {
+            throw new BussinesException(ErrorMessages.EMPLOYEE_DELETE, String.valueOf(id));
         }
+        repository.deleteById(id);
     }
 
     @Override
@@ -67,17 +75,18 @@ public class EmpleadoServiceImpl implements EmpleadoService  {
     public EmpleadoResponse updateEmpleadoById(EmpleadoRequest request, Long id) {
         log.info("actualizando empleado con ID: {}", id);
         Optional<Empleados> empleadoDb = repository.findById(id);
-        if (empleadoDb.isPresent()) {
-            empleadoDb.get().setIdentificationNumber(request.getIdenficationNumber());
-            empleadoDb.get().setName(request.getName());
-            empleadoDb.get().setAddress(request.getAddress());
-            empleadoDb.get().setPhone(request.getPhone());
-            empleadoDb.get().setEmail(request.getEmail());
-            empleadoDb.get().setActive(request.isActive());
-            repository.save(empleadoDb.get());
-            return createEmpleadoResponse(empleadoDb.get());
+        if (!empleadoDb.isPresent()) {
+            throw new BussinesException(ErrorMessages.EMPLOYEE_UPDATE, String.valueOf(id));
         }
-        return null;
+
+        empleadoDb.get().setIdentificationNumber(request.getIdenficationNumber());
+        empleadoDb.get().setName(request.getName());
+        empleadoDb.get().setAddress(request.getAddress());
+        empleadoDb.get().setPhone(request.getPhone());
+        empleadoDb.get().setEmail(request.getEmail());
+        empleadoDb.get().setActive(request.isActive());
+        repository.save(empleadoDb.get());
+        return createEmpleadoResponse(empleadoDb.get());
     }
 
     private Empleados buildEmpleadosForSave(EmpleadoRequest empleadoRequest) {
