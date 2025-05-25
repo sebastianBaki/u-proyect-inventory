@@ -10,6 +10,7 @@ import proyect_u_inventory.transformation.company.dto.response.ProductoResponse;
 import proyect_u_inventory.transformation.company.exception.BussinesException;
 import proyect_u_inventory.transformation.company.model.entity.Producto;
 import proyect_u_inventory.transformation.company.repository.ProductoRepository;
+import proyect_u_inventory.transformation.company.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,16 +87,19 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setDesciption(request.getDescription());
         producto.setStatus(request.getStatus());
         producto.setStock(request.getStock());
+        producto.setPicture(request.getPicture());
         return producto;
     }
 
     private ProductoResponse createProductoResponse(Producto producto) {
+        byte[] imageDescompressd = Util.decompressZLib(producto.getPicture());
         return ProductoResponse.builder()
                 .id(producto.getId())
                 .name(producto.getName())
                 .description(producto.getDesciption())
                 .status(producto.getStatus())
                 .stock(producto.getStock())
+                .picture(imageDescompressd)
                 .build();
     }
 

@@ -32,7 +32,7 @@ public class Producto {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "picture", columnDefinition = "longblob")
+    @Column(name = "picture")
     private byte[] picture;
 
 

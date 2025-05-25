@@ -1,6 +1,7 @@
 package proyect_u_inventory.transformation.company.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +55,9 @@ public class EmpleadosController {
             return ResponseEntity.noContent().build();
         } catch (BussinesException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (DataIntegrityViolationException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("No se puede eliminar el empleado ya que tiene entregas asocidas ");
         }
     }
 
