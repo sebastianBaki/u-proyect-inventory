@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * controller de entrega
  */
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequestMapping("/api/v1/entrega")
 public class EntregaController {

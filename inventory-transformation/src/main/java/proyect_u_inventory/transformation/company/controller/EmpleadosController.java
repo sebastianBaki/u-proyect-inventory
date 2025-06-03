@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import proyect_u_inventory.transformation.company.dto.request.EmpleadoRequest;
+import proyect_u_inventory.transformation.company.dto.response.ContadorItemsResponse;
 import proyect_u_inventory.transformation.company.dto.response.EmpleadoResponse;
 import proyect_u_inventory.transformation.company.exception.BussinesException;
 import proyect_u_inventory.transformation.company.service.EmpleadoService;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * controller de empleados
  */
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequestMapping("/api/v1/empleados")
 public class EmpleadosController {
@@ -68,6 +70,11 @@ public class EmpleadosController {
         } catch (BussinesException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/contar")
+    public ResponseEntity<ContadorItemsResponse> contarIndex(){
+        return ResponseEntity.ok(service.contarItems());
     }
 
 

@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * controller de productos
  */
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequestMapping("/api/v1/productos")
 public class ProductoController {
@@ -73,14 +74,19 @@ public class ProductoController {
             @RequestParam("description") String description,
             @RequestParam("status") String status,
             @RequestParam("stock") int stock,
-            @RequestParam("picture")MultipartFile picture,
+            @RequestParam(value = "picture", required = false)MultipartFile picture,
             @PathVariable Long id) throws IOException{
         ProductoRequest productoRequest = new ProductoRequest();
         productoRequest.setName(name);
         productoRequest.setDescription(description);
         productoRequest.setStatus(status);
         productoRequest.setStock(stock);
-        productoRequest.setPicture(Util.compressZlib(picture.getBytes()));
+        if (picture != null && !picture.isEmpty()) {
+            productoRequest.setPicture(Util.compressZlib(picture.getBytes()));
+        } else {
+            productoRequest.setPicture(new byte[0]);
+        }
+
         try {
             return ResponseEntity.ok(service.updateProductById(productoRequest, id));
         } catch (BussinesException e) {

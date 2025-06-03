@@ -73,10 +73,16 @@ public class ProductoServiceImpl implements ProductoService {
         if (!productoBd.isPresent()) {
             throw new BussinesException(ErrorMessages.PRODUCT_UPDATE, String.valueOf(id));
         }
+
         productoBd.get().setName(request.getName());
         productoBd.get().setDesciption(request.getDescription());
         productoBd.get().setStatus(request.getStatus());
         productoBd.get().setStock(request.getStock());
+
+        if (request.getPicture().length > 0) {
+            productoBd.get().setPicture(request.getPicture());
+        }
+
         productoRepository.save(productoBd.get());
         return createProductoResponse(productoBd.get());
     }

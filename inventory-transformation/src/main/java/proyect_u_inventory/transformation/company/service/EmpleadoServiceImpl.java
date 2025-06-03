@@ -8,10 +8,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import proyect_u_inventory.transformation.company.constants.ErrorMessages;
 import proyect_u_inventory.transformation.company.dto.request.EmpleadoRequest;
+import proyect_u_inventory.transformation.company.dto.response.ContadorItemsResponse;
 import proyect_u_inventory.transformation.company.dto.response.EmpleadoResponse;
 import proyect_u_inventory.transformation.company.exception.BussinesException;
+import proyect_u_inventory.transformation.company.model.entity.Devoluciones;
 import proyect_u_inventory.transformation.company.model.entity.Empleados;
+import proyect_u_inventory.transformation.company.model.entity.Entrega;
+import proyect_u_inventory.transformation.company.model.entity.Producto;
+import proyect_u_inventory.transformation.company.repository.DevolucionesRepository;
 import proyect_u_inventory.transformation.company.repository.EmpleadosRepository;
+import proyect_u_inventory.transformation.company.repository.EntregaRepository;
+import proyect_u_inventory.transformation.company.repository.ProductoRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +33,16 @@ public class EmpleadoServiceImpl implements EmpleadoService  {
 
     @Autowired
     private EmpleadosRepository repository;
+    @Autowired
+    private ProductoRepository productoRepository;
+
+    @Autowired
+    private EntregaRepository entregaRepository;
+
+    @Autowired
+    private DevolucionesRepository devolucionesRepository;
+
+
     @Override
     @Transactional
     public EmpleadoResponse createEmpleado(EmpleadoRequest empleadoRequest) {
@@ -89,6 +106,15 @@ public class EmpleadoServiceImpl implements EmpleadoService  {
         return createEmpleadoResponse(empleadoDb.get());
     }
 
+    @Override
+    public ContadorItemsResponse contarItems() {
+        List<Empleados> empleados = (List<Empleados>) repository.findAll();
+        List<Producto> productos = (List<Producto>) productoRepository.findAll();
+        List<Entrega> entregas = (List<Entrega>) entregaRepository.findAll();
+        List<Devoluciones> devoluciones = (List<Devoluciones>) devolucionesRepository.findAll();
+        return buildContar(empleados, productos, entregas, devoluciones);
+    }
+
     private Empleados buildEmpleadosForSave(EmpleadoRequest empleadoRequest) {
         Empleados empleados = new Empleados();
         empleados.setIdentificationNumber(empleadoRequest.getIdenficationNumber());
@@ -118,6 +144,18 @@ public class EmpleadoServiceImpl implements EmpleadoService  {
         for (Empleados empleado : empleadosList) {
             response.add(createEmpleadoResponse(empleado));
         }
+        return response;
+    }
+
+    private ContadorItemsResponse buildContar(List<Empleados> empleados,
+                                              List<Producto> productos,
+                                              List<Entrega> entregas,
+                                              List<Devoluciones> devoluciones) {
+        ContadorItemsResponse response = new ContadorItemsResponse();
+        response.setEmpleados(empleados.size());
+        response.setProductos(productos.size());
+        response.setEntregas(entregas.size());
+        response.setDevoluciones(devoluciones.size());
         return response;
     }
 }

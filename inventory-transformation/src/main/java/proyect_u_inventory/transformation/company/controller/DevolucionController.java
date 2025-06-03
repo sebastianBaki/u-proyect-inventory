@@ -14,6 +14,7 @@ import proyect_u_inventory.transformation.company.service.EntregaDetalleService;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequestMapping("/api/v1/devolucion")
 public class DevolucionController {

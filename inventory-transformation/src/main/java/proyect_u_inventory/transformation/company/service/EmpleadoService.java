@@ -2,6 +2,7 @@ package proyect_u_inventory.transformation.company.service;
 
 
 import proyect_u_inventory.transformation.company.dto.request.EmpleadoRequest;
+import proyect_u_inventory.transformation.company.dto.response.ContadorItemsResponse;
 import proyect_u_inventory.transformation.company.dto.response.EmpleadoResponse;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface EmpleadoService {
     EmpleadoResponse getById(Long id);
     void deleteById(Long id);
     EmpleadoResponse updateEmpleadoById(EmpleadoRequest request, Long id);
+
+    ContadorItemsResponse contarItems();
 }
